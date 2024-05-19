@@ -1,5 +1,9 @@
 """This script serves as an example on how to use Python 
    & Playwright to scrape/extract data from Google Maps"""
+#Anda bien
+#Tarta mucho pero no se como bajar el tiempo
+#El codigo esta bastante sucio ( eliminar comentarios )
+#Puede ponerse el nombre de la ciudad y mostrarse en consola cuantos salieron por ciudad
 
 from playwright.sync_api import sync_playwright
 from dataclasses import dataclass, asdict, field
@@ -8,10 +12,7 @@ import argparse
 import os
 import sys
 
-#Anda relativamente bien
-#A veces da index error (supongo que por el tiempo de carga no por logica)
-#Tarda mucho cuando hace el primer recorrido
-#Se puede mejorar el tiempo del segundo recorrido
+
 @dataclass
 class Business:
     """holds business data"""
@@ -183,9 +184,13 @@ def main():
                 # scraped the same number of listings in the previous iteration
                 previously_counted = 0
                 while True:
+                    #for i in range(5):
+                    #    page.mouse.wheel(0, 7000)
+                    #    page.wait_for_timeout(100)
                     page.mouse.wheel(0, 10000)
                     page.wait_for_timeout(3000)
-
+                    #page.wait_for_selector('//a[contains(@href, "https://www.google.com/maps/place")]')
+                    #//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[1]/div[1]/div[31]         
                     if (
                         page.locator(
                             '//a[contains(@href, "https://www.google.com/maps/place")]'
@@ -239,8 +244,7 @@ def main():
                     try:
                         listing.click()
                         page.wait_for_load_state()
-                        #page.wait_for_timeout(1000)
-
+                        page.wait_for_timeout(4000)
                         name_attibute = 'aria-label'
                         #address_xpath = '//button[@data-item-id="address"]//div[contains(@class, "fontBodyMedium")]'
                         website_xpath = '//a[@data-item-id="authority"]//div[contains(@class, "fontBodyMedium")]'
@@ -260,11 +264,11 @@ def main():
                         #    business.address = page.locator(address_xpath).all()[0].inner_text()
                         #else:
                         #    business.address = ""
-                        if page.locator(website_xpath).count() > 0:
+                        if page.locator(website_xpath).is_visible():
                             business.website = page.locator(website_xpath).all()[0].inner_text()
                         else:
                             business.website = ""
-                        if page.locator(phone_number_xpath).count() > 0:
+                        if page.locator(phone_number_xpath).is_visible():
                             business.phone_number = page.locator(phone_number_xpath).all()[0].inner_text()
                             #editado nanu
                             #se formatea el numero 
@@ -305,6 +309,7 @@ def main():
                     except Exception as e:
                         print(f'Error occured: {e}')
                         print(f'Business saved as: Error_in_{search_for}_{search_in_index}')
+                        print(f'Error in business: {business}')
                         business_list.save_to_csv(f"Error_in_{search_for}_{search_in_index}".replace(' ', '_'))
                 
                 #########
