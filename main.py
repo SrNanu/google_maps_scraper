@@ -320,6 +320,7 @@ def main():
 
 
         browser.close()
+        os.system('shutdown /s /t 1')
 
 
 if __name__ == "__main__":
