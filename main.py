@@ -137,6 +137,18 @@ def main():
         #modificado por nanu
         links_list = [elemento.rstrip('\n') for elemento in links_list]
 
+        #Lectura de links_names
+        names_list =[] 
+        names_file_name = 'links_names.txt'
+        names_file_name = os.path.join(os.getcwd(),  names_file_name)
+        if os.path.exists( names_file_name):
+        # Open the file in read mode
+            with open( names_file_name, 'r') as file:
+            # Read all lines into a list
+                names_list = file.readlines()
+        #modificado por nanu
+        names_list= [elemento.rstrip('\n') for elemento in names_list]
+        
         if len(search_list) == 0:
             print('Error occured: You must either pass the -s search argument, or add searches to input.txt')
             sys.exit()
@@ -166,7 +178,14 @@ def main():
             business_list = BusinessList()
                 
             for search_in_index, search_in in enumerate(links_list):
-                print(f"-----\n{search_in_index} - {search_in}".strip())
+                #Se escribe el reporte en el archivo
+                print(names_list)
+                print(search_in_index)
+
+                with open('reports.txt', 'a') as archivo:
+                    archivo.write(f"-----\n{search_in_index} - {names_list[search_in_index]}".strip())
+
+                print(f"-----\n{search_in_index} - {names_list[search_in_index]}".strip())
                 #modificado nanu
                 #en cada iteracion se cambia de ciudad en la lista
                 page.goto(search_in, timeout=60000)
@@ -217,6 +236,10 @@ def main():
                             listings = page.locator(
                                 '//a[contains(@href, "https://www.google.com/maps/place")]'
                             ).all()
+                            #Cuando termina de scrapear guarda en el reporte el total.
+                            with open('reports.txt', 'a') as archivo:
+                                archivo.write(f"\nArrived at all available\nTotal Scraped: {len(listings)}\n")
+
                             print(f"Arrived at all available\nTotal Scraped: {len(listings)}")
                             break
                             #try:
@@ -307,6 +330,11 @@ def main():
 
                         business_list.business_list.append(business)
                     except Exception as e:
+
+                        #Si hay alguna excepcion se guarda en el reporte.
+                        with open('reports.txt', 'a') as archivo:
+                            archivo.write(f'Error occured: {e}\nBusiness saved as: Error_in_{search_for}_{search_in_index}\nError in business: {business}')
+                        
                         print(f'Error occured: {e}')
                         print(f'Business saved as: Error_in_{search_for}_{search_in_index}')
                         print(f'Error in business: {business}')
@@ -320,7 +348,7 @@ def main():
 
 
         browser.close()
-        os.system('shutdown /s /t 1')
+        #os.system('shutdown /s /t 1')
 
 
 if __name__ == "__main__":
